@@ -85,8 +85,9 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 DocDir:         %{OHPC_PUB}/doc/contrib
 BuildRequires:  petsc-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
 BuildRequires:  trilinos-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
-BuildRequires:  phdf5-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
+#BuildRequires:  phdf5-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
 BuildRequires:  boost-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
+BuildRequires:  hdf5-devel
 BuildRequires:  python
 BuildRequires:  valgrind%{PROJ_DELIM}
 BuildRequires:  xz
@@ -106,7 +107,6 @@ The libMesh library provides a framework for the numerical simulation of partial
 
 %prep
 %setup -q -n %{pname}-%{version}
-#%patch1 -p1
 
 
 %build
@@ -115,7 +115,8 @@ export OHPC_COMPILER_FAMILY=%{compiler_family}
 export OHPC_MPI_FAMILY=%{mpi_family}
 . %{_sourcedir}/OHPC_setup_compiler
 . %{_sourcedir}/OHPC_setup_mpi
-module load phdf5 boost petsc trilinos
+module load boost petsc trilinos
+module unload hdf5 phdf5
 
 CXX=mpicxx \
 CC=mpicc \
@@ -125,20 +126,18 @@ F77=mpif77 \
 %if %{compiler_family} == gnu7
     --disable-tbb \
 %endif
-    --with-hdf5="${HDF5_DIR}" \
     --with-petsc="${PETSC_DIR}" \
     --with-trilinos="${TRILINOS_DIR}" \
     --with-methods="opt prof" \
-    --prefix=%{install_path}|| { cat config.log && exit 1; }
+    --prefix=%{install_path} || { cat config.log && exit 1; }
 
-make
+%make_build
 
 
 
 
 %install
-
-make install DESTDIR=$RPM_BUILD_ROOT/%{install_path}
+%make_install
 
 # OpenHPC module file
 %{__mkdir} -p %{buildroot}%{OHPC_MODULEDEPS}/%{compiler_family}-%{mpi_family}/%{pname}
@@ -209,6 +208,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{OHPC_HOME}
 %{OHPC_PUB}
-%doc CONTRIBUTING LICENSE
+%doc
 
 %changelog
