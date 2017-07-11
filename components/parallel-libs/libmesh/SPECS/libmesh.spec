@@ -72,7 +72,7 @@ Name:           %{pname}-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
 Summary:        libMesh
 License:        2-clause BSD
 Group:          %{PROJ_NAME}/parallel-libs
-Version:        1.2.0
+Version:        1.2.1
 Release:        1.0_benkirk
 
 Source0:        https://github.com/libMesh/libmesh/releases/download/v%{version}/libmesh-%{version}.tar.gz
@@ -85,7 +85,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 DocDir:         %{OHPC_PUB}/doc/contrib
 BuildRequires:  petsc-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
 BuildRequires:  trilinos-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
-#BuildRequires:  phdf5-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
+BuildRequires:  phdf5-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
 BuildRequires:  boost-%{compiler_family}-%{mpi_family}%{PROJ_DELIM}
 BuildRequires:  hdf5-devel
 BuildRequires:  python
@@ -106,7 +106,7 @@ BuildRequires:  eigen3-devel
 The libMesh library provides a framework for the numerical simulation of partial differential equations using arbitrary unstructured discretizations on serial and parallel platforms. A major goal of the library is to provide support for adaptive mesh refinement (AMR) computations in parallel while allowing a research scientist to focus on the physics they are modeling.
 
 %prep
-%setup -q -n %{pname}-%{version}
+%setup -q -n %{pname}-%{version}-rc1
 
 
 %build
@@ -116,7 +116,7 @@ export OHPC_MPI_FAMILY=%{mpi_family}
 . %{_sourcedir}/OHPC_setup_compiler
 . %{_sourcedir}/OHPC_setup_mpi
 module load boost petsc trilinos
-module unload hdf5 phdf5
+#module unload hdf5 phdf5
 
 CXX=mpicxx \
 CC=mpicc \
@@ -167,6 +167,9 @@ set     version                     %{version}
 if [ expr [ module-info mode load ] || [module-info mode display ] ] {
     if {  ![is-loaded phdf5]  } {
         module load phdf5
+    }
+    if {  ![is-loaded netcdf]  } {
+        module load netcdf
     }
     if {  ![is-loaded petsc]  } {
         module load petsc
