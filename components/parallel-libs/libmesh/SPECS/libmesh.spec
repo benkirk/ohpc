@@ -118,11 +118,11 @@ export OHPC_MPI_FAMILY=%{mpi_family}
 module load boost petsc trilinos
 #module unload hdf5 phdf5
 
-CXX=mpicxx \
-CC=mpicc \
-FC=mpif90 \
-F77=mpif77 \
 ./configure \
+    --with-cxx=`which mpicxx` \
+    --with-cc=`which mpicc` \
+    --with-fc=`which mpif90` \
+    --with-f77=`which mpif77` \
 %if %{compiler_family} == gnu7
     --disable-tbb \
 %endif
